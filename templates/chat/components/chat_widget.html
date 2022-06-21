@@ -1,0 +1,82 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <title>{% block title %}Educa{% endblock %}</title>
+    <link rel="icon" href="http://www.w3.org/2000/svg">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+            crossorigin="anonymous"></script>
+    <link href="{% static "chat/css/base.css" %}" rel="stylesheet">
+</head>
+<body>
+<div id="header">
+    <a href="/" class="logo">Agga Messenger</a>
+</div>
+<div id="content">
+    <div id="chat">
+        <h1>Welcome From My Chat Server.</h1>
+    </div>
+    <div id="chat-input">
+        <input class="form-control" id="chat-message-input" type="text" placeholder="Enter Your Text...............">
+        <input id="chat-message-submit" type="submit" value="Send" hidden>
+    </div>
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+</script>
+<script>
+    $(document).ready(function () {
+        var url = 'ws://' + window.location.host + '/ws/chat/room/' + '{{ course_id }}/';
+        var chatSocket = new WebSocket(url);
+        chatSocket.onmessage = function (e) {
+            var data = JSON.parse(e.data);
+            var message = data.message;
+
+            var dateOptions = {hour: 'numeric', minute: 'numeric', hour12: true};
+            var datetime = new Date(data['datetime']).toLocaleString('en', dateOptions);
+
+            var isMe = data.user === '{{ request.user }}'
+            var source = isMe ? 'me' : 'other';
+            var name = isMe ? 'Me' : data.user;
+
+            var $chat = $('#chat');
+            $chat.append('<div class="message ' + source + '">' +
+                '<strong>' + name + '</strong>' +
+                '<span class="date">' + datetime + '</span><br>' +
+                message + '</div>');
+            $chat.scrollTop($chat[0].scrollHeight);
+        };
+        chatSocket.onclose = function (e) {
+            console.error('Chat socket closed unexpectedly');
+        };
+        var $input = $('#chat-message-input');
+        var $submit = $('#chat-message-submit');
+        $submit.click(function () {
+            var message = $input.val();
+            if (message) {
+                // send message in JSON format
+                chatSocket.send(JSON.stringify({'message': message}));
+                // clear input
+                $input.val('');
+                // return focus
+                $input.focus();
+            }
+        });
+        $input.focus();
+        $input.keyup(function (e) {
+            if (e.which === 13) {
+                // submit with enter / return key
+                $submit.click();
+            }
+        });
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block style %}
+    <link href="{% static 'account/profile/css/profile.css' %}"/>
+{% endblock %}
+{% block title %}Friends{% endblock %}
+{% block content %}
+    {% include 'account/friends/components/nav.html' %}
+    <div class="container">
+        {% block friend_content %}
+        {% endblock %}
+    </div>
+{% endblock %}

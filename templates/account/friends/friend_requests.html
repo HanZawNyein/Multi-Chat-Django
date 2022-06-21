@@ -1,0 +1,28 @@
+{% extends 'account/friends/friends.html' %}
+{% load static %}
+{% block title %}Friend Requests{% endblock %}
+{% block friend_content %}
+    <table class="table shadow p-3 mb-5 bg-body rounded">
+        <tbody>
+        {% for friend in friend_requests %}
+            <tr>
+                <td>
+                    <img src="/media/{{ friend.sender.user_profile.photo }}"
+                         alt="{{ friend.sender.user_profile.photo }}"
+                         class="rounded-pill" style="height: 40px"/>
+                </td>
+                <td>{{ friend.sender.first_name }} {{ friend.sender.last_name }}</td>
+                <td>
+                    <div class="row">
+                        <button class="col btn btn-primary">Details</button>
+                    <form class="col">
+                        {% csrf_token %}
+                        <button type="submit" formaction="{% url 'request_a_friend_decline' friend.sender.id %}" formmethod="post" class="col btn btn-outline-primary">Decline</button>
+                    </form>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

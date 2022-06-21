@@ -1,0 +1,10 @@
+{% if request.user.is_authenticated %}
+    <header class="header" id="header">
+        <div class="header_toggle"><i class='bx bx-menu' id="header-toggle"></i></div>
+        <div class="header_img">
+            <a href="{% url 'profile' %}">
+                <img src="/media/{{ request.user.user_profile.photo }}" alt="">
+            </a>
+        </div>
+    </header>
+{% endif %}

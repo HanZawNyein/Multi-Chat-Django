@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load widget_tweaks %}
+{% block title %}
+    Chats
+{% endblock %}
+{% block content %}
+    <section style="background-color: #f1f1f1;">
+        <div class="container py-5">
+            <div class="row">
+                {% include 'chat/components/users.html' %}
+                {% block chat_widget %}{% endblock %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

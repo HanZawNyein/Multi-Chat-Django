@@ -1,0 +1,30 @@
+{% extends 'account/friends/friends.html' %}
+{% load static %}
+{% block title %}Add Friends{% endblock %}
+{% block friend_content %}
+    <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for friend in all_friends %}
+            <div class="col">
+                <div class="card">
+                    <img src="/media/{{ friend.user.user_profile.photo }}" class="card-img-top" alt="..."
+                         style="width: 50%; height: 20%;">
+                    <div class="card-body">
+                        <form>
+                            {% csrf_token %}
+                            <h5 class="card-title">{{ friend.user.first_name}} {{ friend.user.last_name }}({{ friend.user.username }})</h5>
+                            <button type="submit" class="btn btn-primary disabled" formmethod="post"
+                                    formaction="{% url 'request_a_friend' user.id %}"><i class="bi bi-person-plus"></i>
+                                Friends
+                            </button>
+                            <button type="submit" class="btn btn-outline-secondary disabled" formmethod="post"
+                                    formaction="{% url 'request_a_friend_cancel' user.id %}"><i class="bi bi-x"></i>
+                                Remove
+                            </button>
+                            <a class="btn btn-outline-primary"><i class="bi bi-messenger"></i> Send Message</a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

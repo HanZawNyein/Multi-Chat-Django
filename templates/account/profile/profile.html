@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block style %}
+    <link href="{% static 'account/profile/css/profile.css' %}"/>
+{% endblock %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+    <div class="card">
+        <div class="row card-body p-5">
+            <img src="https://media1.popsugar-assets.com/files/thumbor/3QwXrfWSaJNlviJ_SCoMo5m5eTw/fit-in/728xorig/filters:format_auto-!!-:strip_icc-!!-/2017/05/24/668/n/1922153/02e1469c5925a0a0007234.42391709_edit_img_cover_file_43570969_1495636653/i/Hailee-Steinfeld-Most-Girls-Video-Hair.jpg"
+                 alt="error internet"
+                 style="width: 150px;height: 150px" class="rounded-pill col-4"/>
+            <div class="col">
+                <div class="container">
+                    <h5>{{ request.user.username }}</h5>
+                    <h6>5000 Friends</h6>
+                    <div class="col">
+                        <img src="{% static 'account/profile/images/girl.jfif' %}" alt="user"
+                             class="rounded-pill minimize-avatar"
+                             style="width: 50px;"/>
+                        <img src="{% static 'account/profile/images/girl.jfif' %}" alt="user"
+                             class="rounded-pill minimize-avatar"
+                             style="width: 50px;margin-left: -2%"/>
+                        <img src="{% static 'account/profile/images/girl.jfif' %}" alt="user"
+                             class="rounded-pill minimize-avatar"
+                             style="width: 50px;margin-left: -2%"/>
+                        <img src="{% static 'account/profile/images/girl.jfif' %}" alt="user"
+                             class="rounded-pill minimize-avatar"
+                             style="width: 50px;margin-left: -2%"/>
+                        <img src="{% static 'account/profile/images/girl.jfif' %}" alt="user"
+                             class="rounded-pill minimize-avatar"
+                             style="width: 50px;margin-left: -2%"/>
+                    </div>
+                    <div class="col m-3">
+                        <button class="btn btn-primary align-content-end">
+                            <i class="fa-solid fa-circle-plus"></i>
+                            Add to Story
+                        </button>
+                        <button class="btn btn-secondary align-content-end">
+                            <i class="fa-solid fa-pencil"></i>
+                            Edit Profile
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <hr class="m-3"/>
+            {% include 'account/profile/components/nav.html' %}
+        </div>
+    </div>
+    <div class="container mt-3">
+        {% block profile_component %}
+        {% endblock %}
+    </div>
+{% endblock %}
