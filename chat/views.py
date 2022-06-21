@@ -30,8 +30,5 @@ def all_messages(request, course_id=None):
         "all_friends": rooms_for_list
     }
     if course_id:
-        # room = Room.objects.get(room_number=room_number)
-        # context["room"] = room
-        # context["room_number"] = room_number
-        return render(request, 'chat/components/chatwidget.html', context={"course_id": course_id})
-    return render(request, 'chat/chat.html', context)
+        context["course_id"] = course_id
+    return render(request, 'chat/components/chatwidget.html', context=context)

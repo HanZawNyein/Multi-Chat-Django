@@ -1,115 +1,169 @@
-{% extends 'chat/chat.html' %}
-{% block chat_widget %}
-    <div class="col-md-6 col-lg-7 col-xl-8">
-        <ul id="chat" class="scrollingContainer list-unstyled">
-            <li class="d-flex justify-content-between mb-4">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-6.webp" alt="avatar"
-                     class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="60">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between p-3">
-                        <p class="fw-bold mb-0">Brad Pitt</p>
-                        <p class="text-muted small mb-0"><i class="far fa-clock"></i> 12 mins ago</p>
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-0">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua.
-                        </p>
-                    </div>
-                </div>
-            </li>
-            <li class="d-flex justify-content-between mb-4">
-                <div class="card w-100">
-                    <div class="card-header d-flex justify-content-between p-3">
-                        <p class="fw-bold mb-0">Lara Croft</p>
-                        <p class="text-muted small mb-0"><i class="far fa-clock"></i> 13 mins ago</p>
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-0">
-                            Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque
-                            laudantium.
-                        </p>
-                    </div>
-                </div>
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-5.webp" alt="avatar"
-                     class="rounded-circle d-flex align-self-start ms-3 shadow-1-strong" width="60">
-            </li>
-            <li class="d-flex justify-content-between mb-4">
-                <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-6.webp" alt="avatar"
-                     class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="60">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between p-3">
-                        <p class="fw-bold mb-0">Brad Pitt</p>
-                        <p class="text-muted small mb-0"><i class="far fa-clock"></i> 10 mins ago</p>
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-0">
-                            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut
-                            labore et dolore magna aliqua.
-                        </p>
-                    </div>
-                </div>
-            </li>
-        </ul>
-        <ul>
-            <div id="chat-input" class="fixed-bottom container">
-                <input class="form-control" id="chat-message-input" type="text"
-                       placeholder="Enter Your Text...............">
-                <input id="chat-message-submit" type="submit" value="Send" hidden>
-            </div>
-        </ul>
-    </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
-    </script>
-    <script>
-        $(document).ready(function () {
-            var url = 'ws://' + window.location.host + '/ws/chat/room/' + '{{ course_id }}/';
-            var chatSocket = new WebSocket(url);
-            chatSocket.onmessage = function (e) {
-                var data = JSON.parse(e.data);
-                var message = data.message;
+    {% extends 'chat/chat.html' %}
+    {% load static %}
+    {% block style %}
+        <style>
 
-                var dateOptions = {hour: 'numeric', minute: 'numeric', hour12: true};
-                var datetime = new Date(data['datetime']).toLocaleString('en', dateOptions);
+            #chat .message {
+                background: navy;
+                color: white;
+                padding: 10px 20px;
+                border-radius: 4px;
+                width: auto;
+                display: inline;
+                float: left;
+                margin: 10px 10px 0;
+                min-width: 440px;
+                clear: both;
+            }
 
-                var isMe = data.user === '{{ request.user }}'
-                var source = isMe ? 'me' : 'other';
-                var name = isMe ? 'Me' : data.user;
+            #chat .message.me {
+                display: inline;
+                float: right;
+                background: navy;
+                color: white;
+            }
 
-                var $chat = $('#chat');
-                $chat.append('<div class="message ' + source + '">' +
-                    '<strong>' + name + '</strong>' +
-                    '<span class="date">' + datetime + '</span><br>' +
-                    message + '</div>');
-                $chat.scrollTop($chat[0].scrollHeight);
-            };
-            chatSocket.onclose = function (e) {
-                console.error('Chat socket closed unexpectedly');
-            };
-            var $input = $('#chat-message-input');
-            var $submit = $('#chat-message-submit');
-            $submit.click(function () {
-                var message = $input.val();
-                if (message) {
-                    // send message in JSON format
-                    chatSocket.send(JSON.stringify({'message': message}));
-                    // clear input
-                    $input.val('');
-                    // return focus
-                    $input.focus();
-                }
-            });
-            $input.focus();
-            $input.keyup(function (e) {
-                myDiv = document.querySelector(".scrollingContainer")
-                if (e.which === 13) {
-                    // submit with enter / return key
-                    $submit.click();
-                    if (myDiv.offsetHeight + myDiv.scrollTop >= myDiv.scrollHeight-2000) {
-                        window.scrollTo(0, myDiv.scrollHeight+100);
+            #chat .date {
+                color: #aaa;
+                font-style: italic;
+                font-size: 12px;
+            }
+
+            #chat-input input {
+                width: 96%;
+                position: left;
+                float: left;
+                margin-left: 2%;
+                margin-right: 2%;
+                padding-left: 0;
+                padding-right: 0;
+            }
+
+            #chat-message-submit {
+                background-color: white;
+                color: navy;
+                font-weight: bolder;
+                margin-bottom: 10%;
+            }
+
+            {##chat-message-input {#}
+            {#    margin-bottom: 3%;#}
+            {##}
+        </style>
+    {% endblock %}
+    {% block chat_widget %}
+        <div class="col-md-6 col-lg-7 col-xl-8">
+            <ul id="chat" class="scrollingContainer list-unstyled">
+{#                <li class="d-flex justify-content-between mb-4">#}
+{#                    <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-6.webp" alt="avatar"#}
+{#                         class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="60">#}
+{#                    <div class="card">#}
+{#                        <div class="card-header d-flex justify-content-between p-3">#}
+{#                            <p class="fw-bold mb-0">Brad Pitt</p>#}
+{#                            <p class="text-muted small mb-0"><i class="far fa-clock"></i> 12 mins ago</p>#}
+{#                        </div>#}
+{#                        <div class="card-body">#}
+{#                            <p class="mb-0">#}
+{#                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut#}
+{#                                labore et dolore magna aliqua.#}
+{#                            </p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </li>#}
+{#                <li class="d-flex justify-content-between mb-4">#}
+{#                    <div class="card w-100">#}
+{#                        <div class="card-header d-flex justify-content-between p-3">#}
+{#                            <p class="fw-bold mb-0">Lara Croft</p>#}
+{#                            <p class="text-muted small mb-0"><i class="far fa-clock"></i> 13 mins ago</p>#}
+{#                        </div>#}
+{#                        <div class="card-body">#}
+{#                            <p class="mb-0">#}
+{#                                Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque#}
+{#                                laudantium.#}
+{#                            </p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                    <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-5.webp" alt="avatar"#}
+{#                         class="rounded-circle d-flex align-self-start ms-3 shadow-1-strong" width="60">#}
+{#                </li>#}
+{#                <li class="d-flex justify-content-between mb-4">#}
+{#                    <img src="https://mdbcdn.b-cdn.net/img/Photos/Avatars/avatar-6.webp" alt="avatar"#}
+{#                         class="rounded-circle d-flex align-self-start me-3 shadow-1-strong" width="60">#}
+{#                    <div class="card">#}
+{#                        <div class="card-header d-flex justify-content-between p-3">#}
+{#                            <p class="fw-bold mb-0">Brad Pitt</p>#}
+{#                            <p class="text-muted small mb-0"><i class="far fa-clock"></i> 10 mins ago</p>#}
+{#                        </div>#}
+{#                        <div class="card-body">#}
+{#                            <p class="mb-0">#}
+{#                                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut#}
+{#                                labore et dolore magna aliqua.#}
+{#                            </p>#}
+{#                        </div>#}
+{#                    </div>#}
+{#                </li>#}
+            </ul>
+            <ul>
+                <div id="chat-input" class="fixed-bottom container">
+                    <input class="form-control" id="chat-message-input" type="text"
+                           placeholder="Enter Your Text...............">
+                    <input id="chat-message-submit" type="submit" value="Send" hidden>
+                </div>
+            </ul>
+        </div>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js">
+        </script>
+        <script>
+            $(document).ready(function () {
+                var url = 'ws://' + window.location.host + '/ws/chat/room/' + '{{ course_id }}/';
+                var chatSocket = new WebSocket(url);
+                chatSocket.onmessage = function (e) {
+                    var data = JSON.parse(e.data);
+                    var message = data.message;
+
+                    var dateOptions = {hour: 'numeric', minute: 'numeric', hour12: true};
+                    var datetime = new Date(data['datetime']).toLocaleString('en', dateOptions);
+
+                    var isMe = data.user === '{{ request.user }}'
+                    var source = isMe ? 'me' : 'other';
+                    var name = isMe ? 'Me' : data.user;
+
+                    var $chat = $('#chat');
+
+                    $chat.append('<div class="message ' + source + '">' +
+                        '<strong>' + name + '</strong>' +
+                        '<span class="date">' + datetime + '</span><br>' +
+                        message + '</div>');
+
+                    $chat.scrollTop($chat[0].scrollHeight);
+                };
+                chatSocket.onclose = function (e) {
+                    console.error('Chat socket closed unexpectedly');
+                };
+                var $input = $('#chat-message-input');
+                var $submit = $('#chat-message-submit');
+                $submit.click(function () {
+                    var message = $input.val();
+                    if (message) {
+                        // send message in JSON format
+                        chatSocket.send(JSON.stringify({'message': message}));
+                        // clear input
+                        $input.val('');
+                        // return focus
+                        $input.focus();
                     }
-                }
+                });
+                $input.focus();
+                $input.keyup(function (e) {
+                    myDiv = document.querySelector(".scrollingContainer")
+                    if (e.which === 13) {
+                        // submit with enter / return key
+                        $submit.click();
+                        if (myDiv.offsetHeight + myDiv.scrollTop >= myDiv.scrollHeight - 2000) {
+                            window.scrollTo(0, myDiv.scrollHeight + 100);
+                        }
+                    }
+                });
             });
-        });
-    </script>
-{% endblock %}
+        </script>
+    {% endblock %}
